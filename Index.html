@@ -57,19 +57,15 @@ function applyScreenshotEffect(img, iterations) {
     const canvas = document.createElement('canvas');
     const ctx = canvas.getContext('2d');
 
-    canvas.width = img.width; 
-    canvas.height = img.height; 
+    canvas.width = img.width;
+    canvas.height = img.height;
 
-    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0);
 
-    // Add slight blur to simulate JPEG artifacts
-    ctx.filter = 'blur(1px)';
-    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
-
-    currentImage = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG with lower quality
+    currentImage = canvas.toDataURL('image/jpeg', 0.9); // Re-encode as JPEG
   }
 
-  img.src = currentImage; // Set final image source
+  img.src = currentImage;
 }
   </script>
 </body>
