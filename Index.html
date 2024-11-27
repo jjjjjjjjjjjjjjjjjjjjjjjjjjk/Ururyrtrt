@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>Screenshot Effect</title>
   <style>
     #imageContainer {
-      width: 500px; /* Adjust as needed */
+      width: 500px;
+      /* Adjust as needed */
       height: auto;
       border: 1px solid #ccc;
-      overflow: hidden; /* Hide excess image due to scaling */
+      overflow: hidden;
+      /* Hide excess image due to scaling */
     }
 
     #imageContainer img {
@@ -16,6 +19,7 @@
     }
   </style>
 </head>
+
 <body>
   <input type="file" id="imageUpload" accept="image/*">
   <input type="number" id="iterations" min="1" value="1">
@@ -62,21 +66,23 @@
         canvas.width = img.width;
         canvas.height = img.height;
 
+        // Draw the current image onto the canvas
         ctx.drawImage(img, 0, 0);
 
         currentImage = canvas.toDataURL('image/jpeg', quality);
 
-        // Update image source for the next iteration
-        img.src = currentImage; 
+        // Urpdate the image source with the new compressed image data
+        img.src = currentImage;
 
-        quality -= qualityStep; 
+        quality -= qualityStep;
         if (quality < 0.1) {
-          quality = 0.1; 
+          quality = 0.1;
         }
       }
 
-      img.src = currentImage; // Set the final image source
+      // No need to set img.src here again, it's already updated in the loop
     }
   </script>
 </body>
+
 </html>
