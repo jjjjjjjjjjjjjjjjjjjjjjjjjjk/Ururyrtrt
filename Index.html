@@ -1,21 +1,25 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>Screenshot Effect</title>
-<style>
-#imageContainer {
-  width: 500px; /* Adjust as needed */
-  height: auto;
-  border: 1px solid #ccc;
-  overflow: hidden; /* Hide excess image due to scaling */
-}
 
-#imageContainer img {
-  width: 100%;
-  height: auto;
-}
-</style>
+<head>
+  <title>Screenshot Effect</title>
+  <style>
+    #imageContainer {
+      width: 500px;
+      /* Adjust as needed */
+      height: auto;
+      border: 1px solid #ccc;
+      overflow: hidden;
+      /* Hide excess image due to scaling */
+    }
+
+    #imageContainer img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
 </head>
+
 <body>
   <input type="file" id="imageUpload" accept="image/*">
   <input type="number" id="iterations" min="1" value="1">
@@ -24,49 +28,70 @@
   <div id="imageContainer"></div>
 
   <script>
-const imageUpload = document.getElementById('imageUpload');
-const iterationsInput = document.getElementById('iterations');
-const applyEffectButton = document.getElementById('applyEffect');
-const imageContainer = document.getElementById('imageContainer');
+    const imageUpload = document.getElementById('imageUpload');
+    const iterationsInput = document.getElementById('iterations');
+    const applyEffectButton = document.getElementById('applyEffect');
+    const imageContainer = document.getElementById('imageContainer');
 
-applyEffectButton.addEventListener('click', () => {
-  const file = imageUpload.files[0];
-  const iterations = parseInt(iterationsInput.value);
+    applyEffectButton.addEventListener('click', () => {
+      const file = imageUpload.files[0];
+      const iterations = parseInt(iterationsInput.value);
 
-  if (file) {
-    const reader = new FileReader();
+      if (file) {
+        const reader = new FileReader();
 
-    reader.onload = (e) => {
-      const img = document.createElement('img');
-      img.src = e.target.result;
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
 
-      imageContainer.innerHTML = ''; // Clear previous image
-      imageContainer.appendChild(img);
+          imageContainer.innerHTML = ''; // Clear previous image
+          imageContainer.appendChild(img);
 
-      applyScreenshotEffect(img, iterations);
+          applyScreenshotEffect(img, iterations);
+        }
+
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function applyScreenshotEffect(img, iterations) {
+      let currentImage = img;
+
+      for (let i = 0; i < iterations; i++) {
+        currentImage = createScreenshot(currentImage);
+      }
+
+      imageContainer.innerHTML = '';
+      imageContainer.appendChild(currentImage);
     }
 
-    reader.readAsDataURL(file);
-  }
-});
+    function createScreenshot(img) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
 
-function applyScreenshotEffect(img, iterations) {
-  let currentImage = img.src;
+      const padding = 20; // Space between image and window frame
+      const borderWidth = 10; // Width of the window border
 
-  for (let i = 0; i < iterations; i++) {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
+      canvas.width = img.width + (padding + borderWidth) * 2;
+      canvas.height = img.height + (padding + borderWidth) * 2 + 30; // Add space for title bar
 
-    canvas.width = img.width;
-    canvas.height = img.height;
+      // Draw window frame (simple example, you can customize this)
+      ctx.fillStyle = '#f0f0f0'; // Window background color
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ccc'; // Title bar color
+      ctx.fillRect(0, 0, canvas.width, 30); // Title bar
+      ctx.strokeStyle = '#000'; // Border color
+      ctx.lineWidth = borderWidth;
+      ctx.strokeRect(borderWidth, 30 + borderWidth, canvas.width - borderWidth * 2, canvas.height - borderWidth * 2 - 30);
 
-    ctx.drawImage(img, 0, 0);
+      // Draw image inside the frame
+      ctx.drawImage(img, padding + borderWidth, padding + borderWidth + 30);
 
-    currentImage = canvas.toDataURL('image/jpeg', 0.9); // Re-encode as JPEG
-  }
-
-  img.src = currentImage;
-}
+      const newImg = document.createElement('img');
+      newImg.src = canvas.toDataURL('image/jpeg', 0.9); // Re-encode as JPEG
+      return newImg;
+    }
   </script>
 </body>
+
 </html>
