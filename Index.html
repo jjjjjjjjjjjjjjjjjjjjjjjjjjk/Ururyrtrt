@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Screenshot Effect</title>
+<style>
+#imageContainer {
+  width: 500px; /* Adjust as needed */
+  height: auto;
+  border: 1px solid #ccc;
+  overflow: hidden; /* Hide excess image due to scaling */
+}
+
+#imageContainer img {
+  width: 100%;
+  height: auto;
+}
+</style>
+</head>
+<body>
+  <input type="file" id="imageUpload" accept="image/*">
+  <input type="number" id="iterations" min="1" value="1">
+  <button id="applyEffect">Apply Effect</button>
+
+  <div id="imageContainer"></div>
+
+  <script>
+const imageUpload = document.getElementById('imageUpload');
+const iterationsInput = document.getElementById('iterations');
+const applyEffectButton = document.getElementById('applyEffect');
+const imageContainer = document.getElementById('imageContainer');
+
+applyEffectButton.addEventListener('click', () => {
+  const file = imageUpload.files[0];
+  const iterations = parseInt(iterationsInput.value);
+
+  if (file) {
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+
+      imageContainer.innerHTML = ''; // Clear previous image
+      imageContainer.appendChild(img);
+
+      applyScreenshotEffect(img, iterations);
+    }
+
+    reader.readAsDataURL(file);
+  }
+});
+
+function applyScreenshotEffect(img, iterations) {
+  let currentImage = img.src;
+
+  for (let i = 0; i < iterations; i++) {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = img.width; 
+    canvas.height = img.height; 
+
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+    // Add slight blur to simulate JPEG artifacts
+    ctx.filter = 'blur(1px)';
+    ctx.drawImage(canvas, 0, 0, canvas.width, canvas.height);
+
+    currentImage = canvas.toDataURL('image/jpeg', 0.8); // Use JPEG with lower quality
+  }
+
+  img.src = currentImage; // Set final image source
+}
+  </script>
+</body>
+</html>
