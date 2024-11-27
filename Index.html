@@ -40,7 +40,7 @@
           const img = document.createElement('img');
           img.src = e.target.result;
 
-          imageContainer.innerHTML = ''; // Clear previous image
+          imageContainer.innerHTML = '';
           imageContainer.appendChild(img);
 
           applyScreenshotEffect(img, iterations);
@@ -52,7 +52,8 @@
 
     function applyScreenshotEffect(img, iterations) {
       let currentImage = img.src;
-      let quality = 0.95; // 66  Initial JPEG quality
+      let quality = 0.95; // Initial JPEG quality
+      const qualityStep = quality / iterations; // Quality reduction per iteration
 
       for (let i = 0; i < iterations; i++) {
         const canvas = document.createElement('canvas');
@@ -63,20 +64,19 @@
 
         ctx.drawImage(img, 0, 0);
 
-        // Optional: Add slight blur
-        // ctx.filter = 'blur(0.5px)';
-        // ctx.drawImage(canvas, 0, 0);
-
         currentImage = canvas.toDataURL('image/jpeg', quality);
-        quality -= 0.01; // Slightly reduce quality for next iteration
-        if (quality < 0.7) {
-          quality = 0.7; // Cap the minimum quality
+
+        // Update image source for the next iteration
+        img.src = currentImage; 
+
+        quality -= qualityStep; 
+        if (quality < 0.1) {
+          quality = 0.1; 
         }
       }
 
-      img.src = currentImage;
+      img.src = currentImage; // Set the final image source
     }
   </script>
 </body>
 </html>
-
