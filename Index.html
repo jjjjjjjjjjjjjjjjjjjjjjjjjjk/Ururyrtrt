@@ -1,30 +1,82 @@
-function createScreenshot(img) {
-  const canvas = document.createElement('canvas');
-  const ctx = canvas.getContext('2d');
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Screenshot Effect</title>
+  <style>
+    #imageContainer {
+      width: 500px; /* Adjust as needed */
+      height: auto;
+      border: 1px solid #ccc;
+      overflow: hidden; /* Hide excess image due to scaling */
+    }
 
-  const padding = 20; // Space between image and window frame
-  const borderWidth = 10; // Width of the window border
+    #imageContainer img {
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <input type="file" id="imageUpload" accept="image/*">
+  <input type="number" id="iterations" min="1" value="1">
+  <button id="applyEffect">Apply Effect</button>
 
-  // Calculate the new dimensions for the image to fit inside the frame
-  const imgWidth = img.width - (padding + borderWidth) * 2;
-  const imgHeight = img.height - (padding + borderWidth) * 2 - 30;
+  <div id="imageContainer"></div>
 
-  canvas.width = img.width;
-  canvas.height = img.height;
+  <script>
+    const imageUpload = document.getElementById('imageUpload');
+    const iterationsInput = document.getElementById('iterations');
+    const applyEffectButton = document.getElementById('applyEffect');
+    const imageContainer = document.getElementById('imageContainer');
 
-  // Draw window frame
-  ctx.fillStyle = '#f0f0f0';
-  ctx.fillRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = '#ccc';
-  ctx.fillRect(0, 0, canvas.width, 30);
-  ctx.strokeStyle = '#000';
-  ctx.lineWidth = borderWidth;
-  ctx.strokeRect(borderWidth, 30 + borderWidth, canvas.width - borderWidth * 2, canvas.height - borderWidth * 2 - 30);
+    applyEffectButton.addEventListener('click', () => {
+      const file = imageUpload.files[0];
+      const iterations = parseInt(iterationsInput.value);
 
-  // Draw image inside the frame with adjusted dimensions
-  ctx.drawImage(img, padding + borderWidth, padding + borderWidth + 30, imgWidth, imgHeight);
+      if (file) {
+        const reader = new FileReader();
 
-  const newImg = document.createElement('img');
-  newImg.src = canvas.toDataURL('image/jpeg', 0.9);
-  return newImg;
-}
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+
+          imageContainer.innerHTML = ''; // Clear previous image
+          imageContainer.appendChild(img);
+
+          applyScreenshotEffect(img, iterations);
+        }
+
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function applyScreenshotEffect(img, iterations) {
+      let currentImage = img.src;
+      let quality = 0.95; // 66  Initial JPEG quality
+
+      for (let i = 0; i < iterations; i++) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.drawImage(img, 0, 0);
+
+        // Optional: Add slight blur
+        // ctx.filter = 'blur(0.5px)';
+        // ctx.drawImage(canvas, 0, 0);
+
+        currentImage = canvas.toDataURL('image/jpeg', quality);
+        quality -= 0.01; // Slightly reduce quality for next iteration
+        if (quality < 0.7) {
+          quality = 0.7; // Cap the minimum quality
+        }
+      }
+
+      img.src = currentImage;
+    }
+  </script>
+</body>
+</html>
+
