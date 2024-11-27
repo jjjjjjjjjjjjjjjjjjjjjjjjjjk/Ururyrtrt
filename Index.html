@@ -1,16 +1,13 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title>Screenshot Effect</title>
+  <title>Swrcreenshot Effect</title>
   <style>
     #imageContainer {
-      width: 500px;
-      /* Adjust as needed */
+      width: 500px; 
       height: auto;
       border: 1px solid #ccc;
-      overflow: hidden;
-      /* Hide excess image due to scaling */
+      overflow: hidden; 
     }
 
     #imageContainer img {
@@ -19,7 +16,6 @@
     }
   </style>
 </head>
-
 <body>
   <input type="file" id="imageUpload" accept="image/*">
   <input type="number" id="iterations" min="1" value="1">
@@ -56,33 +52,35 @@
 
     function applyScreenshotEffect(img, iterations) {
       let currentImage = img.src;
-      let quality = 0.95; // Initial JPEG quality
-      const qualityStep = quality / iterations; // Quality reduction per iteration
+      let quality = 0.95; 
+      const qualityStep = quality / iterations;
 
       for (let i = 0; i < iterations; i++) {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
 
-        canvas.width = img.width;
-        canvas.height = img.height;
+        // Create a new image for each iteration to avoid modifying the original
+        const newImg = new Image();  
+        newImg.src = currentImage;
 
-        // Draw the current image onto the canvas
-        ctx.drawImage(img, 0, 0);
+        newImg.onload = () => {
+          canvas.width = newImg.width;
+          canvas.height = newImg.height;
+          ctx.drawImage(newImg, 0, 0);
+          currentImage = canvas.toDataURL('image/jpeg', quality);
 
-        currentImage = canvas.toDataURL('image/jpeg', quality);
-
-        // Urpdate the image source with the new compressed image data
-        img.src = currentImage;
+          // Update the original image only after all iterations
+          if (i === iterations - 1) {
+            img.src = currentImage;
+          }
+        }
 
         quality -= qualityStep;
         if (quality < 0.1) {
           quality = 0.1;
         }
       }
-
-      // No need to set img.src here again, it's already updated in the loop
     }
   </script>
 </body>
-
 </html>
